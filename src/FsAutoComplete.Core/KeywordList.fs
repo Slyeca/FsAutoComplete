@@ -1,6 +1,6 @@
 ﻿namespace FsAutoComplete
 
-module internal KeywordList =
+module KeywordList =
     let private modifiers =
         Map.ofList [
             "abstract",  """Indicates a method that either has no implementation in the type in which it is declared or that is virtual and has a default implementation."""

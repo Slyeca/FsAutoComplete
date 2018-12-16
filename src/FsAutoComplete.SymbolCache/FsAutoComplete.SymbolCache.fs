@@ -9,7 +9,6 @@ open System.Collections.Concurrent
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open System
 open FsAutoComplete.Utils
-open CommandResponse
 open SymbolCache
 open System.IO
 open Microsoft.Data.Sqlite
@@ -158,10 +157,9 @@ module Commands =
             state.Values
             |> Seq.collect id
             |> Seq.where (fun sm -> sm.SymbolFullName = symbolName && not sm.SymbolIsLocal)
-            |> Seq.toList
-        let su : SymbolUseResponse = {Name = uses.[0].SymbolDisplayName; Uses = uses }
+            |> Seq.toArray
 
-        writeJson { Kind = "symboluse"; Data = su }
+        writeJson uses
 
     let updateSymbols (onAdded : string -> SymbolUseRange[] -> unit) (req: SymbolCacheRequest) =
         state.AddOrUpdate(req.Filename, req.Uses, fun _ _ -> req.Uses)
