@@ -99,9 +99,25 @@ Used in match expressions"""
             "@@>", "Delimits a untyped code quotation."
             "=", "Returns `true` if the left side is equal to the right side; otherwise, returns `false`. Also used in a let binding to associates an identifier with a value or function" ]
 
+    let hashDirectives =
+            ["r", "References an assembly"
+             "load", "Reads a source file, compiles it, and runs it."
+             "I", "Specifies an assembly search path in quotation marks."
+             "light", "Enables or disables lightweight syntax, for compatibility with other versions of ML"
+             "if", "Supports conditional compilation"
+             "else", "Supports conditional compilation"
+             "endif", "Supports conditional compilation"
+             "nowarn", "Disables a compiler warning or warnings"
+             "line", "Indicates the original source code line"]
+
     let tryGetKeywordDescription (keyword: string) =
         keywordDescriptions |> Map.tryFind keyword
         |> Option.orElseFun (fun _ -> modifiers |> Map.tryFind keyword)
+
+    let tryGetHashDescription (hash: string) =
+        hashDirectives
+        |> List.tryFind (fun (h,_ ) -> h = hash)
+        |> Option.map snd
 
     let allKeywords : string list =
         [ yield! modifiers |> Map.toSeq |> Seq.map fst
