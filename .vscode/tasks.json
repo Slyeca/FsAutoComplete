@@ -6,7 +6,12 @@
         {
             "taskName": "build",
             "type": "shell",
-            "command": "./build.cmd LocalRelease",
+            "windows": {
+                "command": "./build.cmd LocalRelease"
+            },
+            "osx": {
+                "command": "./build.sh LocalRelease"
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true

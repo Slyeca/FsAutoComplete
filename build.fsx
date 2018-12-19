@@ -1,16 +1,12 @@
+open Fake
 // include Fake lib
 #r @"packages/build/FAKE/tools/FakeLib.dll"
 
-open Fake
 open Fake.Git
 open Fake.ReleaseNotesHelper
-open Fake.UserInputHelper
-open Fake.ZipHelper
 open Fake.AssemblyInfoFile
-open Fake.Testing
 open System
 open System.IO
-open System.Text.RegularExpressions
 
 let githubOrg = "fsharp"
 let project = "FsAutoComplete"
@@ -313,6 +309,27 @@ Target "LocalRelease" (fun _ ->
            Framework = "netcoreapp2.0"
            Project = "src/FsAutoComplete"
            AdditionalArgs = [ "/p:SourceLinkCreate=true" ]  })
+
+    DotNetCli.Build (fun p ->
+      { p with Project = "src/FsAutoComplete.SymbolCache.netcore"; Configuration = "Release" })
+
+    CopyFiles
+      (__SOURCE_DIRECTORY__ </> "bin/release_netcore")
+      !!(__SOURCE_DIRECTORY__ </> "src/FsAutoComplete.SymbolCache.netcore/bin/Release/netcoreapp2.0/*.json")
+
+    let mainfestFile = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <assemblyIdentity version="1.0.0.0" name="MyApplication.app"/>
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
+    <security>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+</assembly>"""
+
+    System.IO.File.WriteAllText(__SOURCE_DIRECTORY__ </> "bin/release_netcore" </> "default.win32manifest", mainfestFile)
 )
 
 #load "paket-files/build/fsharp/FAKE/modules/Octokit/Octokit.fsx"
