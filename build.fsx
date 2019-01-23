@@ -1,12 +1,16 @@
-open Fake
 // include Fake lib
 #r @"packages/build/FAKE/tools/FakeLib.dll"
 
+open Fake
 open Fake.Git
 open Fake.ReleaseNotesHelper
+open Fake.UserInputHelper
+open Fake.ZipHelper
 open Fake.AssemblyInfoFile
+open Fake.Testing
 open System
 open System.IO
+open System.Text.RegularExpressions
 
 let githubOrg = "fsharp"
 let project = "FsAutoComplete"
@@ -311,11 +315,14 @@ Target "LocalRelease" (fun _ ->
            AdditionalArgs = [ "/p:SourceLinkCreate=true" ]  })
 
     DotNetCli.Build (fun p ->
-      { p with Project = "src/FsAutoComplete.SymbolCache.netcore"; Configuration = "Release" })
+       { p with
+           Framework = "netcoreapp2.0"
+           Project = "src/FsAutoComplete"
+           AdditionalArgs = [ "/p:SourceLinkCreate=true" ]  })
 
     CopyFiles
       (__SOURCE_DIRECTORY__ </> "bin/release_netcore")
-      !!(__SOURCE_DIRECTORY__ </> "src/FsAutoComplete.SymbolCache.netcore/bin/Release/netcoreapp2.0/*.json")
+      !!(__SOURCE_DIRECTORY__ </> "src/FsAutoComplete.SymbolCache/bin/Release/netcoreapp2.0/*.json")
 
     let mainfestFile = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
