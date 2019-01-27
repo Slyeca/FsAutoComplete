@@ -255,6 +255,10 @@ Target "IntegrationTestHttpModeNetCore" (fun _ ->
   runall { Mode = HttpMode; Runtime = NETCoreFDD }
 )
 
+Target "LspTest" (fun _ ->
+  DotNetCli.RunCommand id "run -p \"./test/FsAutoComplete.Tests.Lsp/FsAutoComplete.Tests.Lsp.fsproj\""
+)
+
 // Target "UnitTest" (fun _ ->
 //     trace "Running Unit tests."
 //     !! testAssemblies
@@ -385,18 +389,20 @@ Target "All" id
 
 "BuildDebug"
   ==> "Build"
-  // ==> "UnitTest"
+  ==> "LspTest"
 
 // "UnitTest" ==> "Test"
-"IntegrationTest" ==> "Test"
+
 
 "IntegrationTestStdioMode" ==> "IntegrationTest"
 // "IntegrationTestHttpMode" ==> "IntegrationTest"
 "IntegrationTestStdioModeNetCore" =?> ("IntegrationTest", ((environVar "FSAC_TESTSUITE_NETCORE_MODE_STDIO") <> "0"))
 // "IntegrationTestHttpModeNetCore" =?> ("IntegrationTest", ((environVar "FSAC_TESTSUITE_NETCORE_MODE_HTTP") <> "0"))
 
-"BuildDebug" ==> "All"
+"LspTest" ==> "Test"
+"IntegrationTest" ==> "Test"
 "Test" ==> "All"
+"BuildDebug" ==> "All"
 
 "BuildRelease" ==> "LocalRelease"
 "LocalRelease" ==> "ReleaseArchive"
