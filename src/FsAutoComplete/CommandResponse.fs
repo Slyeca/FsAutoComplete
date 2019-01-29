@@ -791,3 +791,5 @@ module CommandResponse =
       analyzer s (messages, file)
     | CoreResponse.SymbolUseRange(ranges) ->
       symbolUseRange s ranges
+    | CoreResponse.InterfaceStub(generatedCode, insertPosition) ->
+      interfaceStub s generatedCode insertPosition

@@ -48,6 +48,7 @@ type CoreResponse =
     | Compile of errors: Microsoft.FSharp.Compiler.SourceCodeServices.FSharpErrorInfo[] * code: int
     | Analyzer of messages: SDK.Message [] * file: string
     | SymbolUseRange of ranges: SymbolCache.SymbolUseRange[]
+    | InterfaceStub of generatedCode: string * insertPosition: pos
 
 [<RequireQualifiedAccess>]
 type NotificationEvent =
@@ -776,14 +777,14 @@ type Commands (serialize : Serializer) =
 
             let! res = tryFindInterfaceExprInBufferAtPos codeGenServer pos doc
             match res with
-            | None -> return [Response.info serialize "Interface at position not found"]
+            | None -> return [CoreResponse.InfoRes "Interface at position not found"]
             | Some interfaceData ->
                 let! stubInfo = handleImplementInterface codeGenServer pos doc lines lineStr interfaceData
 
                 match stubInfo with
                 | Some (insertPosition, generatedCode) ->
-                    return [Response.interfaceStub serialize generatedCode insertPosition]
-                | None -> return [Response.info serialize "Interface at position not found"]
+                    return [CoreResponse.InterfaceStub (generatedCode, insertPosition)]
+                | None -> return [CoreResponse.InfoRes "Interface at position not found"]
         } |> x.AsCancellable (Path.GetFullPath tyRes.FileName)
 
     member x.WorkspacePeek (dir: string) (deep: int) (excludedDirs: string list) = async {
